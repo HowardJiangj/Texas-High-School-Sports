@@ -1,41 +1,76 @@
-# Texas High School Sports · Texas Prep Sports
+# Texas High School Sports
 
-A working Texas high school sports demo with an English-only interface for a U.S. audience. Responsive layouts for desktop and mobile. Built with native HTML, CSS, JavaScript ES Modules, and a dependency-free Node.js static server.
+An English-language Texas high school sports app. Public UIL records are the default experience. The original fictional demo remains available only through **Explore demo** (`?mode=demo`). All pages use the same static site and work on GitHub Pages without a backend.
 
-**All schools, teams, scores, rankings, articles, and predictions are fictional demo fixtures.** No real player, injury, or licensed sports data is included. October basketball and soccer schedules are for demonstration only. Language selection is deferred to a future release.
+## Data included in v0.2
 
-## Run locally
+| Dataset | Coverage |
+| --- | --- |
+| UIL 2026–28 school listing | 1,566 school entries, with source-reported class and enrollment |
+| Football district listings | 1,268 schools |
+| Basketball district listings | 1,389 schools |
+| Volleyball district listings | 1,255 schools |
+| Historical football results | 24 state championship finals: 12 from 2025–26 and 12 from 2024–25 |
 
-Requires Node.js 20 or newer. From this directory:
+Primary sources:
+
+- [UIL 2026–28 Realignment Alphabetical Listing](https://realignment.uiltexas.org/alignments/2026/Alpha_26-28.pdf)
+- [UIL Football State Archives](https://www.uiltexas.org/football/archives)
+
+**Coverage limits:** This is the UIL realignment list, not every public and private high school in Texas. Program districts do not verify varsity rosters or gender-specific participation. Soccer districts, live and regular-season scores, full-season records, power ratings, forecasts, news feeds, city data, mascots, and player health information are not imported.
+
+The historical result’s class and season are kept separate from current alignment. For example, Hamilton won the 2025–26 2A Division 1 football final, while its 2026–28 school listing is 3A. Missing ratings, ranks, and season win/loss records remain `null`, never zero or synthetic values. Imported game dates and venues remain unknown; team order reflects champion/runner-up, not home/away.
+
+This is an independent app, not affiliated with or endorsed by UIL.
+
+## Run
+
+Requires Node.js 20 or newer. No npm dependencies are needed to serve the app:
 
 ```sh
 npm start
 ```
 
-Open <http://127.0.0.1:4173>. To choose another port:
+Open <http://127.0.0.1:4173>. Use `PORT=8080 npm start` to change the port. Serve `dist/` with any HTTP static server; do not open the HTML directly from disk because ES Modules and the JSON snapshot require HTTP.
+
+## Refresh the public data snapshot
+
+Data updates are explicit. The website does not scrape UIL on visitor page loads and no recurring background task is configured.
+
+Requires Python 3.10+ and the importer-only dependency:
 
 ```sh
-PORT=8080 npm start
+python3 -m pip install -r requirements-data.txt
+npm run data:refresh
+npm test
+npm run check
 ```
 
-Alternatively, serve `dist/` with any static HTTP server. Do not open `index.html` directly from the filesystem; ES Modules require HTTP. Google Fonts are optional; system fonts are used if the external font request fails.
+The importer downloads two official source documents and writes `dist/data/official.json` only after validating the complete result. Downloads are cached in ignored `.cache/official/`. To reprocess cached inputs:
+
+```sh
+python3 scripts/import_official.py --offline
+```
+
+Each source records its URL, retrieval time, and SHA-256 fingerprint. Each school references its source and PDF page; each result references the UIL archive and available official box-score links. Offline rebuilds preserve source file retrieval times. Parsing errors, unmatched schools, incomplete finals, duplicate IDs, or invalid districts fail before the last good public snapshot is replaced.
+
+PDF extraction groups words by row and column coordinates to preserve empty district cells. It does not infer district positions from the count of numbers in a text line. Archive names use explicit aliases only (currently `DeSoto` → `De Soto`), never fuzzy school matching.
+
+Changes in official school counts will intentionally require review of the snapshot integrity tests before publishing.
 
 ## Features
 
-- Six views: Overview, Rankings, Scores, Teams, News, and My teams.
-- Twelve fictional schools, 48 varsity teams, four sports, and 24 demo games.
-- Boys football, boys basketball, girls volleyball, and girls soccer. Unsupported gender/sport combinations display an empty state.
-- Filters for sport, classification, region, gender, school name, and city. Filtered teams retain their statewide rank.
-- Simulated scores advance every eight seconds; pause, step forward, or reset them. Updates pause while the page is in the background.
-- Volleyball displays set scores and advances its demo rally label only. Other sports advance using their scoring units. There is no real game clock or automatic final whistle.
-- Team profiles, eight-week sample rating charts, recent form, game details, and fictional article details.
-- Matchup comparison with illustrative score predictions and validation for duplicate teams.
-- Followed teams saved in localStorage. If storage is blocked, follows last for the current page session only.
-- Filtered rankings exported as CSV with a UTF-8 BOM and escaped formula prefixes.
-- U.S. date formats, 12-hour times, and Central Time (CT) labels. The demo schedule is fixed; the last-update clock uses America/Chicago.
-- Mobile bottom navigation, native dialogs, keyboard focus styles, and reduced-motion support.
-
-Followed teams are browser-local, without accounts or cross-device sync. Reloading resets simulated scores but keeps saved teams.
+- Six views: Overview, Rankings, Scores, Schools, News & sources, My schools.
+- Search, class/district/football-format filters, and a paginated school directory.
+- All schools tab includes non-athletic entries in the UIL listing.
+- Source-linked school and championship result detail dialogs.
+- Historical season selector; unsupported seasons and live feeds show clear empty states.
+- Rankings explain that power ratings are unavailable; documented state champions are shown as historical outcomes, not ordered power ratings.
+- Separate browser-local saved-school and demo-favorite keys; no accounts or cross-device sync.
+- CSV directory export with source URLs and retrieval timestamps; raw JSON snapshot download.
+- English UI, responsive layout, keyboard focus styling, and America/Chicago retrieval timestamps.
+- Original demo features retained behind `?mode=demo`, with clearly fictional teams, forecasts, articles, and a simulated clock.
+- The user-provided Google Analytics measurement ID `G-J84H30J4ZT` remains in `dist/index.html`.
 
 ## Checks
 
@@ -44,42 +79,31 @@ npm test
 npm run check
 ```
 
-Built-in Node tests cover fixture references, sport-specific ranking, combined filters, valid predictions, preservation of final/upcoming results, storage failures, and CSV escaping. No external test framework is required.
+Tests cover fixtures, imported identities, district blanks, official counts, known scores, historical/current class separation, compound filters, pagination, storage failures, source URL validation, missing ratings, and protection against passing real results through the demo simulator. No test framework dependency is needed.
 
-## Source layout
+## Structure
 
 ```text
-lonestar/
-├── dist/
-│   ├── index.html         # App shell
-│   ├── styles.css         # Responsive styles
-│   ├── icon.svg           # Original brand mark
-│   └── js/
-│       ├── app.js         # Views, interactions, routing, demo clock
-│       ├── data.js        # Replaceable demo fixtures
-│       └── domain.js      # Ranking, filters, predictions, storage helpers
-├── tests/domain.test.js
-├── server.mjs             # Dependency-free local HTTP server
-└── package.json
+dist/
+  index.html               App shell and Google tag
+  styles.css               Shared responsive styles
+  data/official.json        Validated, source-attributed public snapshot
+  js/
+    app.js                 Mode-aware loader; real data by default
+    official-app.js         Public-record views and interactions
+    official-domain.js      Snapshot validation, filters, CSV and storage
+    demo-app.js             Explicitly selected fictional demo
+    data.js                 Fictional fixtures only
+    domain.js               Demo ranking, forecasts and clock (guarded)
+    icons.js                Shared icon rendering
+scripts/import_official.py  Public-source importer
+requirements-data.txt       Importer-only Python dependency
+server.mjs                 Local static HTTP server
+tests/                     Node built-in tests
 ```
 
-## Demo rules and limitations
+## Deployment
 
-Rankings sort preset ratings in descending order, breaking ties by wins and then school name. Historical changes, records, and rating charts are independent display samples, not a consistent historical dataset.
+Push to `main` to run the included GitHub Actions workflow and deploy `dist/` to GitHub Pages. Snapshots are committed with code and served from the same origin; relative paths support repository subdirectories. The public app fails visibly if its snapshot is unavailable instead of silently substituting demo records.
 
-Home win probability: `round(100 / (1 + exp(-(home rating - away rating + 1.5) / 11)))`. Away win probability is its complement. Predicted scores use sport-specific baselines and the rating difference. Volleyball returns final sets for a best-of-five match. Soccer does not model draws.
-
-These are illustrative formulas, not trained or backtested models. They are not real game predictions. Injuries and availability are always marked “Unknown.”
-
-## Connecting real data later
-
-1. Add a provider module for authorized school, schedule, and score APIs. Map supplier IDs to stable school, team, and game IDs.
-2. Add a server-side database and update jobs with sources and timestamps. Keep secrets in server-side environment variables, never browser code.
-3. Replace preset ratings with sport-specific models based on real results; preserve snapshots and backtest prediction errors.
-4. Add sourced news links and summaries, confirmed availability reports, then accounts, notifications, and more sports.
-
-## GitHub Pages
-
-This folder can be uploaded as a standalone repository. A GitHub Actions workflow is included in `.github/workflows/pages.yml`. In Settings → Pages, select GitHub Actions. Push to `main` to run checks and publish `dist/`.
-
-The optional `.openai/hosting.json` records this demo’s private Sites identity and contains no secrets. Remove `.openai/` when copying the project to a new site. Do not commit API keys, tokens, or restricted licensed datasets.
+No API credentials are needed for this release. Future real-time providers belong behind a server-side adapter; do not place provider secrets or restricted licensed datasets in this public repository.
