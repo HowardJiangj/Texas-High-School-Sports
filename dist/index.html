@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#bf3c2d">
+  <meta name="description" content="Texas High School Sports Texas high school sports demo: team rankings, simulated scores, schedules, team profiles, and predictions. All data is fictional.">
+  <title>Texas High School Sports · Texas Prep Sports</title>
+  <link rel="icon" href="./icon.svg" type="image/svg+xml"><link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to main content</a>
+  <aside class="sidebar" aria-label="Main navigation">
+    <a href="#overview" class="brand"><img src="./icon.svg" alt="" width="38" height="38"><span>Texas High School<br>Sports<small>VARSITY · TEXAS</small></span></a>
+    <p class="nav-label">YOUR GAME. YOUR STATE.</p>
+    <nav id="nav"></nav>
+    <div class="sidebar-bottom"><div class="texas-mark" aria-hidden="true">TX<span>★</span></div><p>One state. Endless possibility.</p><small>Every school. Every season.</small><button class="about-link" data-action="about">About this demo ↗</button></div>
+  </aside>
+  <div class="workspace">
+    <header class="topbar"><div class="breadcrumb">Texas Prep Sports <span>/</span> <strong id="breadcrumb">Overview</strong></div><div class="top-actions"><span class="demo-pill">DEMO</span><button class="avatar" data-action="about" aria-label="About this demo">TX</button></div></header>
+    <main id="main" tabindex="-1">
+      <div class="page-heading"><div><div class="eyebrow">THE LONE STAR STATE</div><h1 id="page-title">Big games. Bigger Texas<span>.</span></h1><p id="page-subtitle">From Friday night lights to state titles. Find your next team to follow.</p></div><div class="edition">DEMO SEASON<span>2026 — 27</span><small>Friday, Oct 16, 2026 · CT</small></div></div>
+      <div class="demo-notice"><span class="notice-icon">i</span><span><strong>You’re exploring a demo.</strong> Schools, scores, rankings, predictions, and stories are fictional. Off-season matchups are included for demonstration.</span><button data-action="about">Data details ↗</button></div>
+      <div class="control-row"><div class="sport-tabs" id="sports" aria-label="Choose a sport"></div><label class="search"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="Search teams or cities…" aria-label="Search teams or cities"><kbd>/</kbd></label></div>
+      <div class="filter-row"><div class="filter-controls"><select id="classification" aria-label="Classification"><option value="all">All classes</option><option>6A</option><option>5A</option><option>4A</option></select><select id="region" aria-label="Region"><option value="all">All regions</option><option value="North">North Texas</option><option value="Central">Central Texas</option><option value="South">South Texas</option><option value="West">West Texas</option><option value="East">East Texas</option></select><select id="gender" aria-label="Team gender"><option value="all">All teams</option><option value="boys">Boys</option><option value="girls">Girls</option></select><button class="reset-filters" data-action="reset-filters" hidden>Clear filters ×</button></div><span class="season-label">VARSITY <span>•</span> 2026–27 DEMO SEASON</span></div>
+      <div id="content"></div>
+      <footer><span><strong>Texas High School Sports</strong> Every team has a place here.</span><span>Demo data · Unofficial rankings · v0.1.0 <button data-action="about">Learn more ↗</button></span></footer>
+    </main>
+  </div>
+  <dialog id="modal" aria-labelledby="modal-title"><button class="modal-close" data-action="close-modal" aria-label="Close dialog">×</button><div id="modal-content"></div></dialog>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <script type="module" src="./js/app.js"></script>
+</body>
+</html>
