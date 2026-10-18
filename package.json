@@ -1,0 +1,16 @@
+{
+  "name": "texas-high-school-sports",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Texas high school sports dashboard \u2014 clearly labeled simulated data",
+  "scripts": {
+    "dev": "node server.mjs",
+    "start": "node server.mjs",
+    "test": "node --test tests/*.test.js",
+    "check": "node --check dist/js/app.js && node --check dist/js/data.js && node --check dist/js/domain.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
